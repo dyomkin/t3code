@@ -3260,6 +3260,7 @@ export function GeneralSettingsPanel() {
         ) : null}
       </SettingsSection>
 
+      <LocalDictationSettings />
       <SettingsSection id="text-generation" title="Text generation">
         <SettingsRow
           serverScoped
@@ -3660,3 +3661,4 @@ export function ArchivedThreadsPanel() {
     </SettingsPageContainer>
   );
 }
+import { LocalDictationSettings } from "./LocalDictationSettings";

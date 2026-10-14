@@ -278,6 +278,7 @@ import { ComposerPendingApprovalActions } from "./ComposerPendingApprovalActions
 import { CompactComposerControlsMenu } from "./CompactComposerControlsMenu";
 import { ComposerImageThumbnail } from "./ComposerImageThumbnail";
 import { ComposerPrimaryActions } from "./ComposerPrimaryActions";
+import { useLocalDictation } from "./useLocalDictation";
 import { ComposerPendingApprovalPanel } from "./ComposerPendingApprovalPanel";
 import { ComposerPendingUserInputPanel } from "./ComposerPendingUserInputPanel";
 import { ComposerPlanFollowUpBanner } from "./ComposerPlanFollowUpBanner";
@@ -1366,6 +1367,7 @@ const ComposerFooterModeControls = memo(function ComposerFooterModeControls(prop
 });
 
 const ComposerFooterPrimaryActions = memo(function ComposerFooterPrimaryActions(props: {
+  dictationControl?: ReactNode;
   compact: boolean;
   canOperateThread: boolean;
   activeContextWindow: ContextWindowSnapshot | null;
@@ -1407,6 +1409,7 @@ const ComposerFooterPrimaryActions = memo(function ComposerFooterPrimaryActions(
 }) {
   return (
     <>
+      {props.dictationControl}
       {props.activeContextWindow ? (
         <ContextWindowMeter
           usage={props.activeContextWindow}
@@ -2244,7 +2247,20 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
       ? attachmentBlockReason
       : (attachmentBlockReason ??
         (multipleModelSelections === null ? providerSendBlockReason : null)));
-  const isSendDisabled = sendDisabledReason !== null;
+  const dictation = useLocalDictation(
+    composerDraftTargetKey,
+    isConnecting ||
+      activePendingApproval !== null ||
+      projectSelectionRequired ||
+      pendingUserInputs.length > 0,
+    (text) => insertComposerText(`${text} `, "cursor", { ensureLeadingBoundary: true }),
+  );
+  const dictationActive = dictation.active;
+  useEffect(() => {
+    if (dictation.error)
+      toastManager.add({ type: "error", title: "Dictation failed", description: dictation.error });
+  }, [dictation.error]);
+  const isSendDisabled = sendDisabledReason !== null || dictation.busy;
   const selectedProviderStatus = useMemo(
     () => selectedProviderEntry?.snapshot ?? null,
     [selectedProviderEntry],
@@ -4279,6 +4295,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
       submissionIntent?: ComposerSubmissionIntent,
     ) => {
       if (
+        dictationActive.current !== null ||
         noProviderAvailable ||
         isSendDisabled ||
         !readEnvironmentScope(environmentId, AuthOrchestrationOperateScope)
@@ -4347,6 +4364,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
       attachmentTargetKey,
       onTypingGuardSend,
       blurMobileComposerAfterSend,
+      dictationActive,
       environmentId,
       isSendDisabled,
       noProviderAvailable,
@@ -7767,6 +7785,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
                     </>
                   ) : null}
                   <ComposerFooterPrimaryActions
+                    dictationControl={dictation.control}
                     compact={isComposerResting || isComposerPrimaryActionsCompact}
                     canOperateThread={canOperateThread}
                     activeContextWindow={
@@ -7794,7 +7813,11 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
                     }
                     promptHasText={prompt.trim().length > 0}
                     isSendBusy={isSendBusy}
-                    sendDisabledReason={sendDisabledReason}
+                    sendDisabledReason={
+                      dictation.busy
+                        ? "Finish or cancel dictation before sending."
+                        : sendDisabledReason
+                    }
                     isConnecting={isConnecting}
                     isEnvironmentUnavailable={
                       environmentUnavailable !== null ||

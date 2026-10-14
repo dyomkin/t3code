@@ -77,6 +77,12 @@ function unwrapEnsureSshEnvironmentResult(result: unknown) {
 }
 
 contextBridge.exposeInMainWorld("desktopBridge", {
+  getLocalDictationStatus: () => ipcRenderer.invoke(IpcChannels.LOCAL_DICTATION_STATUS_CHANNEL),
+  setLocalDictationSettings: (settings) =>
+    ipcRenderer.invoke(IpcChannels.LOCAL_DICTATION_CONFIGURE_CHANNEL, settings),
+  transcribeLocalDictation: (request) =>
+    ipcRenderer.invoke(IpcChannels.LOCAL_DICTATION_TRANSCRIBE_CHANNEL, request),
+  cancelLocalDictation: (id) => ipcRenderer.invoke(IpcChannels.LOCAL_DICTATION_CANCEL_CHANNEL, id),
   getAppBranding: () => {
     const result = ipcRenderer.sendSync(IpcChannels.GET_APP_BRANDING_CHANNEL);
     if (typeof result !== "object" || result === null) {

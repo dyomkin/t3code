@@ -111,6 +111,10 @@
       "types": "./src/providerUpdateRequiredModels.ts",
       "default": "./src/providerUpdateRequiredModels.ts"
     },
+    "./voice-input/wav": {
+      "types": "./src/voice-input/wav.ts",
+      "default": "./src/voice-input/wav.ts"
+    },
     "./voice-input": {
       "types": "./src/voice-input/index.ts",
       "default": "./src/voice-input/index.ts"

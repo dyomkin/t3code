@@ -213,6 +213,7 @@ const layerDesktopLocalEnvironmentAuth = DesktopLocalEnvironmentAuth.layer.pipe(
 );
 
 const layerDesktopApplication = Layer.mergeAll(
+  LocalDictation.layer,
   DesktopLifecycle.layer,
   layerDesktopAppActivation,
   DesktopWebLinks.layer,
@@ -254,3 +255,4 @@ const layerDesktopRuntime = layerDesktopClerk.pipe(
 );
 
 DesktopApp.program.pipe(Effect.provide(layerDesktopRuntime), NodeRuntime.runMain);
+import * as LocalDictation from "./voice/LocalDictation.ts";

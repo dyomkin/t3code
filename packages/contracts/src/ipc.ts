@@ -1123,6 +1123,14 @@ export const SystemSettingsPaneSchema = Schema.Literals(["full-disk-access"]);
 export type SystemSettingsPane = typeof SystemSettingsPaneSchema.Type;
 
 export interface DesktopBridge {
+  getLocalDictationStatus?: () => Promise<import("./localDictation.ts").LocalDictationStatus>;
+  setLocalDictationSettings?: (
+    settings: import("./localDictation.ts").LocalDictationSettings,
+  ) => Promise<void>;
+  transcribeLocalDictation?: (
+    request: import("./localDictation.ts").LocalDictationRequest,
+  ) => Promise<string>;
+  cancelLocalDictation?: (requestId: string) => Promise<void>;
   getAppBranding: () => DesktopAppBranding | null;
   /** Absolute path of a dropped or picked file; absent on desktop builds predating it. */
   getPathForFile?: (file: File) => string;

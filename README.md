@@ -4,6 +4,8 @@ This fork adds **Qoder CLI** as a provider using ACP. Install [Qoder CLI](https:
 
 The packaged desktop fork is named **T3 Code (Qoder)**, uses `~/.t3-qoder` for its data, and disables upstream automatic updates so an update cannot remove Qoder support. Build it with `vp install` and `vp run dist:desktop:win:x64`.
 
+Desktop dictation uses local [whisper.cpp](https://github.com/ggml-org/whisper.cpp). Configure its executable and a multilingual model in **Settings → General → Local dictation**, then click the microphone beside Send, speak, and click Stop. The transcript goes into the draft for review. Cancel discards it. Recordings are limited to two minutes and temporary audio is deleted after recognition. Russian (`ru`) is the default, with English coding vocabulary hints; no API key is needed. Recognition runs on the desktop computer even when the chat uses a remote environment. Browser and mobile clients retain their existing voice capabilities.
+
 T3 Code is an "agent harness control surface". It enables control of the agents on your machine with a best-in-class mobile app ([iOS](https://apps.apple.com/us/app/t3-code-remote-claude-more/id6787819824), [Android](https://play.google.com/store/apps/details?id=com.t3tools.t3code)), [web app](https://app.t3.codes) and [Electron-based desktop app](https://t3.codes).
 
 Works with your subscriptions on Claude Code, Codex, Cursor, Grok Build, OpenCode, and Google Antigravity. If they're set up on your computer, T3 Code can control them.
