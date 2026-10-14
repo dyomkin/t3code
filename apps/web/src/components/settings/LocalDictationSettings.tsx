@@ -1,5 +1,9 @@
 import { useEffect, useState } from "react";
-import type { LocalDictationStatus } from "@t3tools/contracts";
+import {
+  localDictationModelPath,
+  localDictationModelSize,
+  type LocalDictationStatus,
+} from "@t3tools/contracts";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from "../ui/select";
@@ -68,6 +72,38 @@ export function LocalDictationSettings() {
                   }
                 />
               </div>
+            }
+          />
+          <SettingsRow
+            title="Model size"
+            description="Small prioritizes speed; medium prioritizes accuracy. Both are multilingual. Models must be installed in the same folder. Click Save to apply the choice to the next dictation."
+            control={
+              <Select
+                value={localDictationModelSize(status.settings.modelPath)}
+                onValueChange={(size) => {
+                  if (size === "small" || size === "medium")
+                    setStatus({
+                      ...status,
+                      settings: {
+                        ...status.settings,
+                        modelPath: localDictationModelPath(status.settings.modelPath, size),
+                      },
+                    });
+                }}
+              >
+                <SelectTrigger size="sm" aria-label="Whisper model size">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectPopup>
+                  <SelectItem value="small">Small</SelectItem>
+                  <SelectItem value="medium">Medium</SelectItem>
+                  {localDictationModelSize(status.settings.modelPath) === "custom" ? (
+                    <SelectItem value="custom" disabled>
+                      Custom file
+                    </SelectItem>
+                  ) : null}
+                </SelectPopup>
+              </Select>
             }
           />
           <SettingsRow

@@ -13,6 +13,20 @@ export const LocalDictationSettingsSchema = Schema.Struct({
 });
 export type LocalDictationSettings = typeof LocalDictationSettingsSchema.Type;
 
+export type LocalDictationModelSize = "small" | "medium";
+
+/** Presets use the multilingual models beside the currently configured model file. */
+export function localDictationModelSize(modelPath: string): LocalDictationModelSize | "custom" {
+  const match = /(?:^|[\\/])ggml-(small|medium)\.bin$/i.exec(modelPath);
+  const size = match?.[1]?.toLowerCase();
+  return size === "small" || size === "medium" ? size : "custom";
+}
+
+export function localDictationModelPath(modelPath: string, size: LocalDictationModelSize): string {
+  const separator = Math.max(modelPath.lastIndexOf("/"), modelPath.lastIndexOf("\\"));
+  return `${modelPath.slice(0, separator + 1)}ggml-${size}.bin`;
+}
+
 export const LocalDictationStatusSchema = Schema.Struct({
   settings: LocalDictationSettingsSchema,
   available: Schema.Boolean,
