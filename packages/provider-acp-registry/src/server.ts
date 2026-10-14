@@ -9,6 +9,7 @@
  * @module provider-acp-registry/server
  */
 export { AcpRegistryDriver, type AcpRegistryDriverEnv } from "./server/driver.ts";
+export { QoderDriver, QoderAdapterV2Driver } from "./server/qoder.ts";
 export {
   AcpRegistryAdapterV2Driver,
   type AcpRegistryAdapterV2DriverEnv,

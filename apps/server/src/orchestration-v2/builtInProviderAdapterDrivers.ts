@@ -2,6 +2,7 @@ import type { ProviderDriverKind } from "@t3tools/contracts";
 
 import {
   AcpRegistryAdapterV2Driver,
+  QoderAdapterV2Driver,
   type AcpRegistryAdapterV2DriverEnv,
 } from "@t3tools/provider-acp-registry/server";
 import {
@@ -40,6 +41,7 @@ const BUILT_IN_PROVIDER_ADAPTER_DRIVERS_V2: ReadonlyArray<
   GrokAdapterV2Driver,
   PiAdapterV2Driver,
   AcpRegistryAdapterV2Driver,
+  QoderAdapterV2Driver,
 ];
 
 export const BUILT_IN_PROVIDER_ADAPTER_DRIVER_KINDS_V2: ReadonlySet<ProviderDriverKind> = new Set(

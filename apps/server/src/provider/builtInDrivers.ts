@@ -22,6 +22,7 @@
  */
 import {
   AcpRegistryDriver,
+  QoderDriver,
   type AcpRegistryDriverEnv,
 } from "@t3tools/provider-acp-registry/server";
 import { AntigravityDriver, type AntigravityDriverEnv } from "./Drivers/AntigravityDriver.ts";
@@ -68,6 +69,7 @@ export const BUILT_IN_DRIVERS: ReadonlyArray<AnyProviderDriver<BuiltInDriversEnv
   PiDriver,
   MuseDriver,
   AcpRegistryDriver,
+  QoderDriver,
 ];
 
 /** Services the built-in usage readers need. */

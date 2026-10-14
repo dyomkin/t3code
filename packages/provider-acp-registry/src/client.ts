@@ -9,6 +9,21 @@ import { ProviderDriverKind } from "@t3tools/contracts";
 import { defineProviderClient } from "@t3tools/provider-core/client";
 
 import { AcpRegistrySettings } from "./settings.ts";
+import { QoderSettings } from "./qoderSettings.ts";
+
+export const qoderClient = defineProviderClient({
+  driverKind: ProviderDriverKind.make("qoder"),
+  label: "Qoder",
+  settingsSchema: QoderSettings,
+  environmentFields: [
+    {
+      name: "QODER_PERSONAL_ACCESS_TOKEN",
+      label: "Qoder access token",
+      description: "Optional personal access token. Otherwise uses your Qoder CLI login.",
+      sensitive: true,
+    },
+  ],
+});
 
 export const acpRegistryClient = defineProviderClient({
   driverKind: ProviderDriverKind.make("acpRegistry"),

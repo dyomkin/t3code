@@ -459,14 +459,16 @@ function migrateLegacyProviderSettings(
   };
 }
 
-const ACP_REGISTRY_DRIVER = ProviderDriverKind.make("acpRegistry");
+const ACP_ONLY_DRIVERS = new Set(["acpRegistry", "qoder"]);
 
 /** ACP Registry instances reject every application text-generation operation. */
 function selectionSupportsTextGeneration(
   settings: ServerSettings,
   selection: ModelSelection,
 ): boolean {
-  return settings.providerInstances[selection.instanceId]?.driver !== ACP_REGISTRY_DRIVER;
+  return !ACP_ONLY_DRIVERS.has(
+    settings.providerInstances[selection.instanceId]?.driver ?? selection.instanceId,
+  );
 }
 
 function resolveTextGenerationProvider(settings: ServerSettings): ServerSettings {
