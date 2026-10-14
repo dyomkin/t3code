@@ -1,6 +1,6 @@
 # T3 Code
 
-This fork adds **Qoder CLI** as a provider using ACP. Install [Qoder CLI](https://docs.qoder.com/cli/installation), run `qodercli login`, and select **Qoder** when starting a thread. The executable path and optional `QODER_PERSONAL_ACCESS_TOKEN` can be configured in provider settings. Models and permission modes are discovered from Qoder. Qoder supports chat and coding tasks; automatic commit messages, PR descriptions and thread titles currently require another provider.
+This fork adds **Qoder CLI** as a provider using ACP. Install [Qoder CLI](https://docs.qoder.com/cli/installation), run `qodercli login`, and select **Qoder** when starting a thread. The executable path and optional `QODER_PERSONAL_ACCESS_TOKEN` can be configured in provider settings. Models and permission modes are discovered from Qoder. Select a Qoder model for text generation and the source control writer to generate thread titles, commit messages, branch names, and PR titles/descriptions with Qoder.
 
 The packaged desktop fork is named **T3 Code (Qoder)**, uses `~/.t3-qoder` for its data, and disables upstream automatic updates so an update cannot remove Qoder support. Build it with `vp install` and `vp run dist:desktop:win:x64`.
 

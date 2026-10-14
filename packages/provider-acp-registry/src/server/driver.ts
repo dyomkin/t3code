@@ -176,6 +176,7 @@ export function acpRegistrySnapshotReadiness(
 
 interface SnapshotIdentity {
   readonly driverKind?: ProviderDriverKind;
+  readonly supportsTextGeneration?: boolean;
   readonly instanceId: ProviderInstance["instanceId"];
   readonly displayName: string | undefined;
   readonly accentColor: string | undefined;
@@ -208,10 +209,8 @@ function baseSnapshot(
     ...(input.accentColor ? { accentColor: input.accentColor } : {}),
     ...(iconUrl ? { iconUrl } : {}),
     continuation: { groupKey: input.continuationKey },
-    // The registry driver rejects every application text-generation operation,
-    // so selectors must not offer these instances for commit, PR, branch, or
-    // title generation.
-    supportsTextGeneration: false,
+    // Generic ACP agents opt out; dedicated drivers can supply a metadata runner.
+    supportsTextGeneration: input.supportsTextGeneration ?? false,
     enabled: input.settings.enabled,
     installed: input.installed,
     version: input.version,
@@ -461,6 +460,10 @@ export function makeAcpRegistryDriver(
     ProviderDriver<AcpRegistrySettings, AcpRegistryDriverEnv>,
     "driverKind" | "metadata" | "configSchema" | "defaultConfig"
   >,
+  makeTextGeneration?: (
+    settings: AcpRegistrySettings,
+    environment: NodeJS.ProcessEnv,
+  ) => Effect.Effect<ProviderTextGeneration, never, AcpRegistryDriverEnv>,
 ): ProviderDriver<AcpRegistrySettings, AcpRegistryDriverEnv> {
   const DRIVER_KIND = definition.driverKind;
   const AcpRegistryAdapterV2Driver = makeAcpRegistryAdapterV2Driver(DRIVER_KIND);
@@ -495,6 +498,7 @@ export function makeAcpRegistryDriver(
         });
         const identity = {
           driverKind: DRIVER_KIND,
+          supportsTextGeneration: makeTextGeneration !== undefined,
           instanceId,
           displayName,
           accentColor,
@@ -505,6 +509,9 @@ export function makeAcpRegistryDriver(
           environment,
           hostEnvironment,
         );
+        const textGeneration = makeTextGeneration
+          ? yield* makeTextGeneration(effectiveConfig, processEnvironment)
+          : makeUnsupportedTextGeneration();
         const orchestrationAdapter = yield* AcpRegistryAdapterV2Driver.create({
           instanceId,
           displayName,
@@ -812,7 +819,7 @@ export function makeAcpRegistryDriver(
             ),
           },
           orchestrationAdapter,
-          textGeneration: makeUnsupportedTextGeneration(),
+          textGeneration,
           acpSessionManagement: {
             listSessions: ({ cwd, cursor }) =>
               provideAcpManagementServices(

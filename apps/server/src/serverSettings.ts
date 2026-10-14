@@ -459,7 +459,7 @@ function migrateLegacyProviderSettings(
   };
 }
 
-const ACP_ONLY_DRIVERS = new Set(["acpRegistry", "qoder"]);
+const ACP_ONLY_DRIVERS = new Set(["acpRegistry"]);
 
 /** ACP Registry instances reject every application text-generation operation. */
 function selectionSupportsTextGeneration(

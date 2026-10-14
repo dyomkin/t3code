@@ -877,6 +877,26 @@ it.layer(NodeServices.layer)("server settings", (it) => {
     }).pipe(Effect.provide(layerServerSettings())),
   );
 
+  it.effect.each(["qoder", "qoder_work"])("preserves Qoder metadata selection for %s", (instance) =>
+    Effect.gen(function* () {
+      const serverSettings = yield* ServerSettingsModule.ServerSettingsService;
+      const instanceId = ProviderInstanceId.make(instance);
+      const selection = { instanceId, model: "efficient" };
+      const next = yield* serverSettings.updateSettings({
+        providerInstances: {
+          [instanceId]: { driver: ProviderDriverKind.make("qoder"), enabled: true, config: {} },
+        },
+        textGenerationModelSelection: selection,
+        sourceControlWriterModelSelection: selection,
+      });
+      assert.deepEqual(next.textGenerationModelSelection, selection);
+      assert.deepEqual(
+        ServerSettingsModule.resolveSourceControlWriterModelSelection(next, undefined, null),
+        selection,
+      );
+    }).pipe(Effect.provide(layerServerSettings())),
+  );
+
   it.effect(
     "preserves the source control writer selection when its provider instance is disabled",
     () =>

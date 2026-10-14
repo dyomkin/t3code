@@ -13,6 +13,7 @@ import { QoderDriver } from "./qoder.ts";
 const decodeSettings = Schema.decodeUnknownSync(QoderSettings);
 const identity = {
   driverKind: ProviderDriverKind.make("qoder"),
+  supportsTextGeneration: true,
   instanceId: ProviderInstanceId.make("qoder_work"),
   displayName: "Qoder Work",
   accentColor: undefined,
@@ -47,7 +48,7 @@ describe("Qoder provider", () => {
       continuation: { groupKey: identity.continuationKey },
       installed: true,
       status: "ready",
-      supportsTextGeneration: false,
+      supportsTextGeneration: true,
     });
   });
 
