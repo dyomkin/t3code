@@ -78,6 +78,8 @@ function unwrapEnsureSshEnvironmentResult(result: unknown) {
 
 contextBridge.exposeInMainWorld("desktopBridge", {
   getLocalDictationStatus: () => ipcRenderer.invoke(IpcChannels.LOCAL_DICTATION_STATUS_CHANNEL),
+  setLocalDictationModel: (size) =>
+    ipcRenderer.invoke(IpcChannels.LOCAL_DICTATION_MODEL_CHANNEL, size),
   setLocalDictationSettings: (settings) =>
     ipcRenderer.invoke(IpcChannels.LOCAL_DICTATION_CONFIGURE_CHANNEL, settings),
   transcribeLocalDictation: (request) =>

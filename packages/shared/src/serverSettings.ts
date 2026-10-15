@@ -87,7 +87,6 @@ const TEXT_GENERATION_FALLBACK_DRIVERS = [
   "pi",
   "opencode",
   "antigravity",
-  "qoder",
 ].map((driver) => ProviderDriverKind.make(driver));
 
 /**

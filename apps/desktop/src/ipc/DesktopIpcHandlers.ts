@@ -86,6 +86,7 @@ import {
 export const installDesktopIpcHandlers = Effect.fn("desktop.ipc.installHandlers")(function* () {
   const ipc = yield* DesktopIpc.DesktopIpc;
   yield* ipc.handle(DictationIpc.getLocalDictationStatus);
+  yield* ipc.handle(DictationIpc.setLocalDictationModel);
   yield* ipc.handle(DictationIpc.setLocalDictationSettings);
   yield* ipc.handle(DictationIpc.transcribeLocalDictation);
   yield* ipc.handle(DictationIpc.cancelLocalDictation);

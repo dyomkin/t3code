@@ -314,8 +314,13 @@ export function resolveSelectableProviderInstanceEntry(
     }
   }
   return (
-    entries.find(isProviderInstancePickerReady) ??
-    entries.find((entry) => isSelectableProviderInstanceEntry(entry) && entry.status !== "error")
+    entries.find((entry) => entry.driverKind !== "qoder" && isProviderInstancePickerReady(entry)) ??
+    entries.find(
+      (entry) =>
+        entry.driverKind !== "qoder" &&
+        isSelectableProviderInstanceEntry(entry) &&
+        entry.status !== "error",
+    )
   );
 }
 

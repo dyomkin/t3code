@@ -26,6 +26,15 @@ export const getLocalDictationStatus = DesktopIpc.makeIpcMethod({
     return yield* (yield* LocalDictation).status;
   }),
 });
+export const setLocalDictationModel = DesktopIpc.makeIpcMethod({
+  channel: Channels.LOCAL_DICTATION_MODEL_CHANNEL,
+  payload: Schema.Literals(["small", "medium"]),
+  result: LocalDictationStatusSchema,
+  handler: Effect.fn(function* (size, event) {
+    yield* trusted(event);
+    return yield* (yield* LocalDictation).selectModel(size);
+  }),
+});
 export const setLocalDictationSettings = DesktopIpc.makeIpcMethod({
   channel: Channels.LOCAL_DICTATION_CONFIGURE_CHANNEL,
   payload: LocalDictationSettingsSchema,

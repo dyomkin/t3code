@@ -1,10 +1,23 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { MicIcon, SquareIcon, XIcon } from "lucide-react";
-import { LOCAL_DICTATION_MAX_SECONDS } from "@t3tools/contracts";
+import { ChevronDownIcon, MicIcon, SquareIcon, XIcon } from "lucide-react";
+import {
+  LOCAL_DICTATION_MAX_SECONDS,
+  localDictationModelSize,
+  type LocalDictationStatus,
+} from "@t3tools/contracts";
 import { recordingToWavBase64 } from "../../lib/dictationAudio";
 import { randomUUID } from "../../lib/utils";
 import { Button } from "../ui/button";
 import { Tooltip, TooltipPopup, TooltipTrigger } from "../ui/tooltip";
+import {
+  Menu,
+  MenuTrigger,
+  MenuPopup,
+  MenuRadioGroup,
+  MenuRadioItem,
+  MenuGroupLabel,
+  MenuGroup,
+} from "../ui/menu";
 
 type Recording = {
   id: string;
@@ -27,6 +40,26 @@ export function useLocalDictation(
   const bridge = typeof window === "undefined" ? undefined : window.desktopBridge;
   const [phase, setPhase] = useState<"idle" | "preparing" | "recording" | "transcribing">("idle");
   const [error, setError] = useState<string | null>(null);
+  const [modelStatus, setModelStatus] = useState<LocalDictationStatus | null>(null);
+  const [changingModel, setChangingModel] = useState(false);
+  const refreshModel = () =>
+    bridge
+      ?.getLocalDictationStatus?.()
+      .then(setModelStatus)
+      .catch(() => {});
+  const model = modelStatus ? localDictationModelSize(modelStatus.settings.modelPath) : null;
+  useEffect(() => {
+    let disposed = false;
+    void bridge
+      ?.getLocalDictationStatus?.()
+      .then((status) => {
+        if (!disposed) setModelStatus(status);
+      })
+      .catch(() => {});
+    return () => {
+      disposed = true;
+    };
+  }, [bridge, target]);
   const active = useRef<Recording | null>(null);
   const insertRef = useRef({ target, insert });
   useLayoutEffect(() => {
@@ -173,6 +206,53 @@ export function useLocalDictation(
         </TooltipTrigger>
         <TooltipPopup>{label}</TooltipPopup>
       </Tooltip>
+      {bridge.setLocalDictationModel ? (
+        <Menu
+          onOpenChange={(open) => {
+            if (open) void refreshModel();
+          }}
+        >
+          <MenuTrigger
+            render={
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                aria-label={`Whisper model: ${model ?? "loading"}`}
+                disabled={phase !== "idle" || changingModel}
+                onPointerDown={(event) => event.preventDefault()}
+              />
+            }
+          >
+            {model === "small" ? "Small" : model === "medium" ? "Medium" : "Whisper"}
+            <ChevronDownIcon />
+          </MenuTrigger>
+          <MenuPopup side="bottom" align="end">
+            <MenuGroup>
+              <MenuGroupLabel>Local Whisper model</MenuGroupLabel>
+              <MenuRadioGroup
+                value={model ?? ""}
+                onValueChange={(size) => {
+                  if (size !== "small" && size !== "medium") return;
+                  setChangingModel(true);
+                  setError(null);
+                  void bridge.setLocalDictationModel!(size)
+                    .then(setModelStatus)
+                    .catch((cause) =>
+                      setError(
+                        cause instanceof Error ? cause.message : "Could not change Whisper model.",
+                      ),
+                    )
+                    .finally(() => setChangingModel(false));
+                }}
+              >
+                <MenuRadioItem value="small">Small — faster</MenuRadioItem>
+                <MenuRadioItem value="medium">Medium — more accurate</MenuRadioItem>
+              </MenuRadioGroup>
+            </MenuGroup>
+          </MenuPopup>
+        </Menu>
+      ) : null}
       {phase !== "idle" ? (
         <>
           <span className="text-xs text-muted-foreground" role="status">

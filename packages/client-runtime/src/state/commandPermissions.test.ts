@@ -8,6 +8,7 @@ import { describe, expect, it } from "@effect/vitest";
 import { vi } from "vite-plus/test";
 import {
   AuthOrchestrationOperateScope,
+  AuthEnvironmentMaintainScope,
   AuthSettingsWriteScope,
   AuthSourceControlWriteScope,
   ThreadId,
@@ -59,6 +60,31 @@ const setup = Effect.gen(function* () {
 });
 
 describe("command permissions", () => {
+  it.effect("requires the destination host maintenance grant to change automatic shutdown", () =>
+    Effect.scoped(
+      Effect.gen(function* () {
+        const registry = yield* setup;
+        const shutdown = createCommandPermissions(runtime, WS_METHODS.serverSetIdleShutdown);
+        registry.set(sessions(env), AsyncResult.success(grant(true)));
+        expect(registry.get(shutdown.permissionAtom(env))).toBe(false);
+        expect((yield* shutdown.authorize(registry, env).pipe(Effect.flip))._tag).toBe(
+          "EnvironmentAuthorizationError",
+        );
+        registry.set(
+          sessions(env),
+          AsyncResult.success({
+            ...grant(false),
+            scopes: [AuthEnvironmentMaintainScope],
+            permissions: [AuthEnvironmentMaintainScope],
+          }),
+        );
+        expect(registry.get(shutdown.permissionAtom(env))).toBe(true);
+        yield* shutdown.authorize(registry, env);
+        registry.set(sessions(other), AsyncResult.success(grant(true)));
+        expect(registry.get(shutdown.permissionAtom(other))).toBe(false);
+      }),
+    ),
+  );
   it.effect("requires the destination settings grant to run storage cleanup", () =>
     Effect.scoped(
       Effect.gen(function* () {

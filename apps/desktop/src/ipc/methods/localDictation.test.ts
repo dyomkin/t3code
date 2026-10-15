@@ -9,6 +9,7 @@ import { ElectronWindow } from "../../electron/ElectronWindow.ts";
 import { LocalDictation } from "../../voice/LocalDictation.ts";
 import {
   getLocalDictationStatus,
+  setLocalDictationModel,
   transcribeLocalDictation,
   cancelLocalDictation,
 } from "./localDictation.ts";
@@ -47,6 +48,11 @@ describe("local dictation IPC authorization", () => {
     );
     return Effect.gen(function* () {
       const request = { requestId: "test", wavBase64: "AA==" };
+      assert.isTrue(
+        Exit.isFailure(
+          yield* Effect.exit(setLocalDictationModel.handler("small", { sender: { id: 99 } })),
+        ),
+      );
       assert.isTrue(
         Exit.isFailure(
           yield* Effect.exit(getLocalDictationStatus.handler(undefined, { sender: { id: 99 } })),

@@ -22,6 +22,7 @@ import {
   ChatGptHandoffState,
 } from "./providerSetup.ts";
 import * as Schema from "effect/Schema";
+import { IdleShutdownStatus, IdleShutdownError } from "./idleShutdown.ts";
 import * as Rpc from "effect/rpc/Rpc";
 import * as RpcGroup from "effect/rpc/RpcGroup";
 import * as RpcMiddleware from "effect/rpc/RpcMiddleware";
@@ -474,6 +475,8 @@ export const WS_METHODS = {
   // Server meta
   serverProbe: "server.probe",
   serverGetConfig: "server.getConfig",
+  serverGetIdleShutdown: "server.getIdleShutdown",
+  serverSetIdleShutdown: "server.setIdleShutdown",
   serverRefreshProviders: "server.refreshProviders",
   serverUpdateProvider: "server.updateProvider",
   serverUpdateServer: "server.updateServer",
@@ -608,6 +611,17 @@ const WsServerGetConfigRpc = Rpc.make(WS_METHODS.serverGetConfig, {
   payload: Schema.Struct({}),
   success: ServerConfig,
   error: Schema.Union([KeybindingsConfigError, ServerSettingsError, EnvironmentAuthorizationError]),
+});
+
+const WsServerGetIdleShutdownRpc = Rpc.make(WS_METHODS.serverGetIdleShutdown, {
+  payload: Schema.Struct({}),
+  success: IdleShutdownStatus,
+  error: EnvironmentAuthorizationError,
+});
+const WsServerSetIdleShutdownRpc = Rpc.make(WS_METHODS.serverSetIdleShutdown, {
+  payload: Schema.Struct({ enabled: Schema.Boolean }),
+  success: IdleShutdownStatus,
+  error: Schema.Union([IdleShutdownError, EnvironmentAuthorizationError]),
 });
 
 const WsServerRefreshProvidersRpc = Rpc.make(WS_METHODS.serverRefreshProviders, {
@@ -1878,6 +1892,8 @@ export class RpcScopeAuthorization extends RpcMiddleware.Service<RpcScopeAuthori
 export const WsRpcGroup = RpcGroup.make(
   WsServerProbeRpc,
   WsServerGetConfigRpc,
+  WsServerGetIdleShutdownRpc,
+  WsServerSetIdleShutdownRpc,
   WsServerRefreshProvidersRpc,
   WsServerUpdateProviderRpc,
   WsProviderConsumeResetCreditRpc,

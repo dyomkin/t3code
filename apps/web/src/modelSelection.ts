@@ -363,7 +363,10 @@ export function resolveAppModelSelectionState(
     (entry) => entry.instanceId === selection.instanceId && entry.enabled && entry.isAvailable,
   );
   const entry =
-    selectedEntry ?? entries.find((candidate) => candidate.enabled && candidate.isAvailable);
+    selectedEntry ??
+    entries.find(
+      (candidate) => candidate.driverKind !== "qoder" && candidate.enabled && candidate.isAvailable,
+    );
   if (entry) {
     // When the instance changed due to fallback (e.g. selected instance was disabled),
     // don't carry over the old instance's model — use the fallback instance's default.

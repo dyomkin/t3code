@@ -983,6 +983,17 @@ export function createServerEnvironmentAtoms<R, E>(
 
   return {
     configValueAtom,
+    idleShutdown: createEnvironmentRpcQueryAtomFamily(runtime, {
+      label: "environment-data:server:idle-shutdown",
+      tag: WS_METHODS.serverGetIdleShutdown,
+      staleTimeMs: 0,
+      idleTtlMs: 0,
+    }),
+    setIdleShutdown: createEnvironmentRpcCommand(runtime, {
+      label: "environment-data:server:set-idle-shutdown",
+      tag: WS_METHODS.serverSetIdleShutdown,
+      concurrency: { mode: "singleFlight", key: ({ environmentId }) => environmentId },
+    }),
     runStorageCleanup: createEnvironmentRpcCommand(runtime, {
       label: "environment-data:server:run-storage-cleanup",
       tag: WS_METHODS.serverRunStorageCleanup,

@@ -352,6 +352,21 @@ describe("deriveProviderEntriesByEnvironment", () => {
 });
 
 describe("resolveSelectableProviderInstance", () => {
+  it("keeps Qoder selectable explicitly but never chooses it as an automatic fallback", () => {
+    const qoder = ProviderInstanceId.make("qoder");
+    const providers = [provider({ provider: ProviderDriverKind.make("qoder"), instanceId: qoder })];
+    expect(resolveSelectableProviderInstance(providers, undefined)).toBeUndefined();
+    expect(resolveSelectableProviderInstance(providers, qoder)).toBe(qoder);
+    expect(
+      resolveSelectableProviderInstance(
+        [
+          ...providers,
+          provider({ provider: ProviderDriverKind.make("codex"), instanceId: "codex" }),
+        ],
+        undefined,
+      ),
+    ).toBe("codex");
+  });
   it("returns the requested instance when it is enabled and available", () => {
     const requested = ProviderInstanceId.make("claude_work");
     const providers = [

@@ -27,10 +27,10 @@ import {
 const FOLDED_SERVER_SETTINGS = { ...DEFAULT_SERVER_SETTINGS, projectSettingsFolded: true };
 
 describe("fallbackTextGenerationModelSelection", () => {
-  it("falls back to Qoder's default model when only Qoder is enabled", () => {
+  it("keeps Qoder manual-only when it is the only enabled provider", () => {
     expect(
       fallbackTextGenerationModelSelection({}, (instanceId) => instanceId === "qoder"),
-    ).toEqual({ instanceId: "qoder", model: "auto" });
+    ).toBeNull();
   });
   it("ignores a configured non-default instance at machine scope, matching no fallback", () => {
     const configured = ProviderInstanceId.make("codex_work");

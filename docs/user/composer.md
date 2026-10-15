@@ -12,6 +12,26 @@ becomes an attachment when inserting it would exceed the message limit. On a
 hardware keyboard, use `Cmd+Shift+V` on Apple devices or `Ctrl+Shift+V` elsewhere
 to keep a large paste editable in the composer instead.
 
+## Local dictation
+
+On desktop, record a message with the microphone in the composer. The menu beside
+it switches between multilingual Whisper Small (faster) and Medium (more accurate)
+for the next recording. Your choice saves immediately. Set the model files,
+language and vocabulary in **Settings → General → Local dictation**.
+
+## Shut down after tasks finish
+
+On the local Windows desktop environment, enable the power toggle beside the
+microphone before sending a task or while it runs. It waits for all tasks in that
+environment, including queued messages, delegated agents and checkpoints, then
+starts a two-minute countdown. Click the toggle again to cancel. New work resets
+the countdown; a failed or interrupted task cancels automatic shutdown.
+
+The toggle starts off and applies only once during the current T3 Code session.
+When enabled while idle, it waits for a new task first. Other applications and
+remote environments are not included. Windows can prevent shutdown when an
+application has unsaved documents.
+
 ## Formatting
 
 The composer writes Markdown and shows it styled as you type. Markers such as

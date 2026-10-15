@@ -9,6 +9,8 @@ import * as Schema from "effect/Schema";
 import {
   LOCAL_DICTATION_DEFAULT_PROMPT,
   LocalDictationSettingsSchema,
+  localDictationModelPath,
+  type LocalDictationModelSize,
   type LocalDictationSettings,
   type LocalDictationStatus,
   type LocalDictationRequest,
@@ -37,6 +39,9 @@ export class LocalDictation extends Context.Service<
   LocalDictation,
   {
     readonly status: Effect.Effect<LocalDictationStatus, LocalDictationError>;
+    readonly selectModel: (
+      size: LocalDictationModelSize,
+    ) => Effect.Effect<LocalDictationStatus, LocalDictationError>;
     readonly configure: (
       settings: LocalDictationSettings,
     ) => Effect.Effect<void, LocalDictationError>;
@@ -89,15 +94,22 @@ export const make = Effect.gen(function* () {
       };
     }
   });
+  const writeSettings = async (settings: LocalDictationSettings) => {
+    await NodeFSP.mkdir(dir, { recursive: true });
+    const tmp = `${configPath}.${NodeCrypto.randomUUID()}.tmp`;
+    await NodeFSP.writeFile(tmp, JSON.stringify(settings, null, 2), "utf8");
+    await NodeFSP.rename(tmp, configPath);
+  };
   return LocalDictation.of({
     status,
-    configure: (settings) =>
+    selectModel: (size) =>
       attempt(async () => {
-        await NodeFSP.mkdir(dir, { recursive: true });
-        const tmp = `${configPath}.${NodeCrypto.randomUUID()}.tmp`;
-        await NodeFSP.writeFile(tmp, JSON.stringify(settings, null, 2), "utf8");
-        await NodeFSP.rename(tmp, configPath);
-      }),
+        const settings = await readSettings();
+        const modelPath = localDictationModelPath(settings.modelPath, size);
+        await NodeFSP.access(modelPath);
+        await writeSettings({ ...settings, modelPath });
+      }).pipe(Effect.andThen(status)),
+    configure: (settings) => attempt(() => writeSettings(settings)),
     cancel: (requestId) =>
       Effect.sync(() => {
         active.get(requestId)?.abort();

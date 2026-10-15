@@ -1123,6 +1123,9 @@ export const SystemSettingsPaneSchema = Schema.Literals(["full-disk-access"]);
 export type SystemSettingsPane = typeof SystemSettingsPaneSchema.Type;
 
 export interface DesktopBridge {
+  setLocalDictationModel?: (
+    size: import("./localDictation.ts").LocalDictationModelSize,
+  ) => Promise<import("./localDictation.ts").LocalDictationStatus>;
   getLocalDictationStatus?: () => Promise<import("./localDictation.ts").LocalDictationStatus>;
   setLocalDictationSettings?: (
     settings: import("./localDictation.ts").LocalDictationSettings,

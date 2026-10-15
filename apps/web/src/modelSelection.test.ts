@@ -68,6 +68,25 @@ function settingsWithProviderInstances(): UnifiedSettings {
 }
 
 describe("instance-scoped model selection", () => {
+  it("does not silently use Qoder for application text generation", () => {
+    const qoder = provider({
+      provider: ProviderDriverKind.make("qoder"),
+      instanceId: "qoder",
+      models: ["auto"],
+    });
+    expect(resolveAppModelSelectionState(DEFAULT_UNIFIED_SETTINGS, [qoder])).toEqual(
+      NO_PROVIDER_MODEL_SELECTION,
+    );
+    expect(
+      resolveAppModelSelectionState(
+        {
+          ...DEFAULT_UNIFIED_SETTINGS,
+          textGenerationModelSelection: createModelSelection(qoder.instanceId, "auto", []),
+        },
+        [qoder],
+      ).instanceId,
+    ).toBe("qoder");
+  });
   it("preserves server-provided legacy model metadata", () => {
     const baseProvider = provider({
       instanceId: "claudeAgent",
